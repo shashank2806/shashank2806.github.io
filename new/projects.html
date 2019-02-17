@@ -7,12 +7,50 @@
     body {
       padding: 2%;
     }
+    li {
+    list-style: none;
+    padding: 10px 40px;
+    }
+    ul {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+    }
     p {
       text-align:center;
+      margin-top: 10px;
+      margin-left: 30%;
+      margin-right: 30%;
     }
   </style>
 </head>
 <body>
   <h1 style="text-align:center">Projects</h1>
+  <h2 style="text-align:center">Is it a Chhetah, Leopard or Jaguar?</h2>
+  <p>
+      Identifies if it is a cheetah, a leopard, or a jaguar by looking at their images. I always have trouble classifying
+      between these three big cats, that's why I thought to make a classifier using deep-learning.
+      In the project, I created a dataset set by scrapping images from Google Images. I have used about 300 images from each class.
+  </p>
+  <div id="menu" style="text-align:center;">
+      <ul>
+          <li><a href="https://github.com/shashank2806/cheetah-leopard-jaguar">GitHub</a>
+          </li>
+          <li><a href="https://bigcats.onrender.com/">Live Demo</a>
+      </ul>
+  </div>
+  <h2 style="text-align:center">Apna-Broker</h2>
+  <p>
+      A REST API for predicting house prices in the Bangalore region. Deployed the API on Heroku. 
+      The API was made in Flask microframework. The model was by Gradient Boosting Algorithm using XGBoost Library.
+  </p>
+  <div id="menu" style="text-align:center;">
+      <ul>
+          <li><a href="https://github.com/EvilCoders/Apna-Broker">GitHub</a>
+          </li>
+          <li><a href="https://evilcoders.github.io/Apna-Broker/#/predict">Live Demo</a>
+      </ul>
+  </div>
 </body>
 </html> 
