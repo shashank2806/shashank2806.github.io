@@ -1,0 +1,12 @@
+---
+title: "About"
+---
+
+I work as Data Scientist. I want to understand things clearly, and explain them well.
+
+I'm always looking for opportunities to work on exciting projects. I'm currently open to part-time and full-time positions, as well as contract work. Let's make something great, together.
+
+
+<footer>
+    <a href="https://info.flagcounter.com/Gtp6"><img src="https://s01.flagcounter.com/count/Gtp6/bg_FFFFFF/txt_000000/border_FFFFFF/columns_5/maxflags_12/viewers_0/labels_0/pageviews_0/flags_0/percent_0/" alt="Flag Counter" border="0"></a>
+</footer>

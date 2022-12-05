@@ -1,0 +1,31 @@
+project:
+  type: website
+
+website:
+  title: "Shashank Shekhar"
+  site-url: https://shashankshekhar.me/
+  navbar:
+    pinned: True
+    left:
+      - icon: house
+        href: index.qmd
+        text: Home
+      - href: https://shashankshekhar.me/myblog/
+        text: Blog
+      - about.qmd
+    right:
+      - icon: linkedin
+        href: https://linkedin.com/in/shashank2806
+      - icon: github
+        href: https://github.com/shashank2806
+      - icon: twitter
+        href: https://twitter.com/shekhar28june
+
+format:
+  html:
+    theme: cosmo
+    css: styles.css
+    toc: true
+
+
+

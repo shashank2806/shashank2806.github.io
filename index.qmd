@@ -1,0 +1,51 @@
+---
+title: Hello World! I am Shashank Shekhar
+comments: False
+format:
+  html:
+    page-layout: full
+listing:
+  - id: landing-posts
+    contents: posts
+    type: default
+    max-items: 3
+    sort: 
+      - "date desc"
+      - "title asc"
+about:
+  id: about-me
+  template: solana
+  image: profile.jfif
+  image-shape: round
+  links:
+    - icon: linkedin
+      text: LinkedIn
+      href: https://www.linkedin.com/in/shashank2806/
+    - icon: github
+      text: GitHub
+      href: https://github.com/shashank2806
+    - icon: medium
+      text: Medium
+      href: https://medium.com/@correspond.shashank  
+    - icon: twitter
+      text: Twitter
+      href: https://twitter.com/ShashankData
+    - icon: clipboard-data
+      text: Kaggle
+      href: https://www.kaggle.com/shashank2806
+    - icon: envelope
+      text: Email
+      href: mailto:correspond.shashank@gmail.com
+---
+
+:::::{#about-me}
+I am working as Data Scientist with 3+ years of experience. I have led several Deep learning based Vision & NLP Projects. I am well versed on developing and deploying ML solutions on Azure cloud.
+
+Read more about me [here](about.qmd).
+:::::
+
+
+
+<a href="https://info.flagcounter.com/Gtp6"><img
+          src="https://s01.flagcounter.com/count/Gtp6/bg_FFFFFF/txt_000000/border_FFFFFF/columns_5/maxflags_12/viewers_0/labels_0/pageviews_0/flags_0/percent_0/"
+          border="0" style="display:none"></a>
