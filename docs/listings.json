@@ -1,6 +1,18 @@
 [
   {
     "listing": "/index.html",
-    "items": []
+    "items": [
+      "/posts/linear-regression/Linear_Regression.html",
+      "/posts/deploy-on-web-app/index.html",
+      "/posts/welcome/index.html"
+    ]
+  },
+  {
+    "listing": "/blog.html",
+    "items": [
+      "/posts/linear-regression/Linear_Regression.html",
+      "/posts/deploy-on-web-app/index.html",
+      "/posts/welcome/index.html"
+    ]
   }
 ]

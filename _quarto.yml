@@ -11,7 +11,7 @@ website:
       - icon: house
         href: index.qmd
         text: Home
-      - href: https://shashankshekhar.me/myblog/
+      - href: blog.qmd
         text: Blog
       - about.qmd
     right:

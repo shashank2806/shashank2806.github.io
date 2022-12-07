@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.1.251">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Shashank Shekhar">
+<meta name="dcterms.date" content="2022-11-20">
+<meta name="description" content="In this blog, I am going to show how to deploy a Machine Learning API on Azure App Service (Web App).">
+
+<title>Shashank Shekhar - Deploy ML Application on Azure App Service</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Shashank Shekhar</span>
+    </a>
+  </div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html">Home</a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://shashankshekhar.me/myblog/">Blog</a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../about.html">About</a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://linkedin.com/in/shashank2806"><i class="bi bi-linkedin" role="img">
+</i> 
+ </a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/shashank2806"><i class="bi bi-github" role="img">
+</i> 
+ </a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com/shekhar28june"><i class="bi bi-twitter" role="img">
+</i> 
+ </a>
+  </li>  
+</ul>
+              <div id="quarto-search" class="" title="Search"></div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Deploy ML Application on Azure App Service</h1>
+                  <div>
+        <div class="description">
+          In this blog, I am going to show how to deploy a Machine Learning API on Azure App Service (Web App).
+        </div>
+      </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">Azure</div>
+                <div class="quarto-category">Flask</div>
+                <div class="quarto-category">API</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Shashank Shekhar </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">November 20, 2022</p>
+      </div>
+    </div>
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#step-0-test-the-api-locally." id="toc-step-0-test-the-api-locally." class="nav-link active" data-scroll-target="#step-0-test-the-api-locally.">Step 0 : Test the API locally.</a></li>
+  <li><a href="#step---1-create-azure-resources" id="toc-step---1-create-azure-resources" class="nav-link" data-scroll-target="#step---1-create-azure-resources">Step - 1: Create Azure Resources</a></li>
+  <li><a href="#step-2-push-code-to-the-web-app" id="toc-step-2-push-code-to-the-web-app" class="nav-link" data-scroll-target="#step-2-push-code-to-the-web-app">Step 2: Push code to the Web App</a></li>
+  <li><a href="#step-3-bonus--connect-it-with-the-front-end." id="toc-step-3-bonus--connect-it-with-the-front-end." class="nav-link" data-scroll-target="#step-3-bonus--connect-it-with-the-front-end.">Step 3: Bonus- Connect it with the front-end.</a></li>
+  <li><a href="#final-words" id="toc-final-words" class="nav-link" data-scroll-target="#final-words">Final Words</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+<p>In this blog, I am going to show how to deploy a Machine Learning API on Azure App Service. I am assuming that you have trained your model, wrapped it into the API, and the API is running on the local machine. For this blog, I have trained a deep-learning model with help of PyTorch. The API I am going to deploy is a simple Cat vs Dog Classification API, which takes input images and returns if it is a cat or dog. <img src="0.png" class="img-fluid" data-fig-align="center"> <strong>By the end of this blog you will be able to understand:</strong></p>
+<ol type="1">
+<li>How to create an Azure Web App</li>
+<li>Difference between Azure Web App and App Service.</li>
+<li>Deploy your API on the Azure Web App</li>
+<li>Test your deployment</li>
+<li>Bonus: How to connect the front-end to the API running on Web App.</li>
+</ol>
+<p><strong>Prerequisites:</strong></p>
+<ol type="1">
+<li>An Flask/FastAPI API is running locally.</li>
+<li>Postman - for API Testing</li>
+<li>Azure Account (Obviously!)</li>
+</ol>
+<p>This is my folder structure. Out of these files 3 are important for deployment.</p>
+<ol type="1">
+<li><code>app.py</code> - Code for API is present here</li>
+<li><code>res18_10.pth</code> - PyTorch trained model</li>
+<li><code>requirement.txt</code> - contains the dependent packages.( If you don’t have this. You can get them doing pip freeze in the virtual environment)</li>
+</ol>
+<p>All these files can be found here if want to look in more details Github repo: <a href="https://github.com/shashank2806/simple-classifier-demo" class="uri">https://github.com/shashank2806/simple-classifier-demo</a></p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="1.png" class="img-fluid figure-img"></p>
+<p></p><figcaption class="figure-caption"><em>Files in the directory</em></figcaption><p></p>
+</figure>
+</div>
+<section id="step-0-test-the-api-locally." class="level3">
+<h3 class="anchored" data-anchor-id="step-0-test-the-api-locally.">Step 0 : Test the API locally.</h3>
+<ol type="1">
+<li><p>Test the API in the virtual environment you have developed it. If you have not developed it in a virtual environment, I would strongly suggest that you create one and install all the dependencies into it using <code>requirements.txt</code>.</p></li>
+<li><p>Test it on postman.</p></li>
+</ol>
+<p>This is my API running locally on postman, it has route named ‘/pred’ which takes images as from-data.</p>
+<p><em>This is the response when I upload this image of the cat. The model predicts it is a cat, cool.</em></p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="cat.jpg" class="img-fluid figure-img"></p>
+<p></p><figcaption class="figure-caption"><em>Input image of cat</em></figcaption><p></p>
+</figure>
+</div>
+<p>As I have tested the API on my machine. Now it is ready for deployment. <img src="2.png" class="img-fluid" data-fig-align="center" alt="API testing though postman on localhost"></p>
+</section>
+<section id="step---1-create-azure-resources" class="level3">
+<h3 class="anchored" data-anchor-id="step---1-create-azure-resources">Step - 1: Create Azure Resources</h3>
+<p>I am now going to create an Azure web app. A web app is the quickest method to deploy your APIs on the cloud. It supports both code and docker containers. In this blog, we are focusing on deployment through code.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="3.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+<p>Create a web app on the Azure portal. Select the subscription and Resource Group. You need to give it a unique name. Select OS and your python version. In my case, I have selected 3.10. Select the region.</p>
+<p>Now we have to select a <strong>app service plan</strong>. Most people have confusion between web app and app service.(Even both terms are used interchangeably) <em>App service is the hardware on which you web app is deployed.</em> Single App service can host multiple web apps. Keep this in mind when selecting your app service plan. I am selecting B1 plan, which is capable enough to host this API.</p>
+<p><img src="4.png" class="img-fluid" data-fig-align="center"> <img src="5.png" class="img-fluid" data-fig-align="center"></p>
+<p>Click <strong>Review+Create</strong></p>
+<p>The web app is created. A URL is also assigned - <a href="https://pytorch-demo.azurewebsites.net/" class="uri">https://pytorch-demo.azurewebsites.net/</a></p>
+<p>This is the URL where the web app will be hosted, There is nothing there right now.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="6.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</section>
+<section id="step-2-push-code-to-the-web-app" class="level3">
+<h3 class="anchored" data-anchor-id="step-2-push-code-to-the-web-app">Step 2: Push code to the Web App</h3>
+<ol type="1">
+<li><p>On the Azure Portal, go to the Deployment centre and select local git as the deployment source. You will get the git clone path, and username and password in the Credentials tab. Tip: The username is just <code>${web app name}</code>, in my case <code>$pytorch-demo</code>, Do not enter the full username provided. <img src="7.png" class="img-fluid" data-fig-align="center"></p></li>
+<li><p>Go to the directory containing the code. You can also test it on my demo code. Clone the github repo using <code>git clone https://github.com/shashank2806/simple-classifier-demo.git</code> You need <code>git</code> to be initialised (<code>git init</code>) in the directory, and commit (<code>git commit</code>) the changes you want to be uploaded.</p></li>
+<li><p>Add a new <code>remote</code> to push code. I had initially one remote(<code>origin</code>) pointing to my Github. I have added new remote named <code>azure</code> which connects to web app. Use <code>git remote add &lt;git-clone-uri&gt;</code> to add remote. <img src="8.png" class="img-fluid" data-fig-align="center"></p></li>
+<li><p>Now push the code to Azure using - <code>git push azure master</code> <img src="9.png" class="img-fluid" data-fig-align="center"></p></li>
+<li><p>Now wait for few minutes, you can see the logs on the screen. Wait until the deployment succeeds.</p></li>
+</ol>
+<p><strong>Voila</strong> The deplyment to the cloud is done! Now we can test it on postman.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="10.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+<p>Great!! As you can see, We have deployed the API over the cloud, now anyone can access it. We just need to give the user Endpoint and Key.</p>
+</section>
+<section id="step-3-bonus--connect-it-with-the-front-end." class="level3">
+<h3 class="anchored" data-anchor-id="step-3-bonus--connect-it-with-the-front-end.">Step 3: Bonus- Connect it with the front-end.</h3>
+<p>We have deployed our backend API on the web app. As you may have noticed there is an <code>index.html</code> in the directory. This contains a very simple front-end. We can connect the back-end API to the front-end.</p>
+<p>The <code>index.html</code> is hosted through GitHub Pages(free hosting). The the hosted URL is <a href="https://shashankshekhar.me/simple-classifier-demo/" class="uri">https://shashankshekhar.me/simple-classifier-demo/</a></p>
+<p>If you look into index.html, You will find a JavaScript - Fetch is used for calling the API. (You can get the code snippet to connect with help of postman.)</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode javascript code-with-copy"><code class="sourceCode javascript"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>    <span class="kw">var</span> requestOptions <span class="op">=</span> {</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>        <span class="dt">method</span><span class="op">:</span> <span class="st">"POST"</span><span class="op">,</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>        <span class="dt">body</span><span class="op">:</span> formData<span class="op">,</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>        <span class="dt">redirect</span><span class="op">:</span> <span class="st">"follow"</span><span class="op">,</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    }<span class="op">;</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Change endpoint here</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">fetch</span>(<span class="st">"https://pytorch-demo.azurewebsites.net/pred"</span><span class="op">,</span> requestOptions)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>You can make some minor changes on this front-end to tailor it to your need. I have changed the Endpoint URL to the web app.</p>
+<p>Let’s try with our cat image. On this front-end.</p>
+<p><img src="11.png" class="img-fluid" data-fig-align="center"> Voila! We have got the result, The API is taking to the font-end, the request we are making on our web browser is going to our API and fetching the results from there.</p>
+<p><em>The API might not be responsing by the time you are looking at this web page - I will delete the App Service later.</em></p>
+</section>
+<section id="final-words" class="level3">
+<h3 class="anchored" data-anchor-id="final-words">Final Words</h3>
+<p>We now know:</p>
+<ol type="1">
+<li>How to deploy your API on the Azure app service</li>
+<li>Test the API through Postman</li>
+<li>How to connect it to the front end. (or how to communicate with the frontend engineer about your ML API. Give them, endpoints, routes and keys/schema)</li>
+</ol>
+<p>This method will work in most cases, where there are not complex dependencies, sometimes, there are OS-based dependencies for which we will have to deploy through Docker.</p>
+<p><strong><em>Enjoy. Happy Learning!!!</em></strong></p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    setTimeout(function() {
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const cites = ref.parentNode.getAttribute('data-cites').split(' ');
+    tippyHover(ref, function() {
+      var popup = window.document.createElement('div');
+      cites.forEach(function(cite) {
+        var citeDiv = window.document.createElement('div');
+        citeDiv.classList.add('hanging-indent');
+        citeDiv.classList.add('csl-entry');
+        var biblioDiv = window.document.getElementById('ref-' + cite);
+        if (biblioDiv) {
+          citeDiv.innerHTML = biblioDiv.innerHTML;
+        }
+        popup.appendChild(citeDiv);
+      });
+      return popup.innerHTML;
+    });
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

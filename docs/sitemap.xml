@@ -2,10 +2,26 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://shashankshekhar.me/about.html</loc>
-    <lastmod>2022-12-05T04:47:10.404Z</lastmod>
+    <lastmod>2022-12-07T17:53:19.391Z</lastmod>
   </url>
   <url>
     <loc>https://shashankshekhar.me/index.html</loc>
-    <lastmod>2022-12-05T04:47:10.994Z</lastmod>
+    <lastmod>2022-12-07T17:50:31.421Z</lastmod>
+  </url>
+  <url>
+    <loc>https://shashankshekhar.me/blog.html</loc>
+    <lastmod>2022-12-07T17:50:37.901Z</lastmod>
+  </url>
+  <url>
+    <loc>https://shashankshekhar.me/posts/welcome/index.html</loc>
+    <lastmod>2022-12-07T17:47:59.971Z</lastmod>
+  </url>
+  <url>
+    <loc>https://shashankshekhar.me/posts/linear-regression/Linear_Regression.html</loc>
+    <lastmod>2022-12-07T17:48:01.051Z</lastmod>
+  </url>
+  <url>
+    <loc>https://shashankshekhar.me/posts/deploy-on-web-app/index.html</loc>
+    <lastmod>2022-12-07T17:48:02.131Z</lastmod>
   </url>
 </urlset>

@@ -1,0 +1,514 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss  xmlns:atom="http://www.w3.org/2005/Atom" 
+      xmlns:media="http://search.yahoo.com/mrss/" 
+      xmlns:content="http://purl.org/rss/1.0/modules/content/" 
+      xmlns:dc="http://purl.org/dc/elements/1.1/" 
+      version="2.0">
+<channel>
+<title>Shashank Shekhar</title>
+<link>https://shashankshekhar.me/blog.html</link>
+<atom:link href="https://shashankshekhar.me/blog.xml" rel="self" type="application/rss+xml"/>
+<description></description>
+<generator>quarto-1.1.251</generator>
+<lastBuildDate>Sat, 26 Nov 2022 18:30:00 GMT</lastBuildDate>
+<item>
+  <title>Linear Regression - A Deep Dive!</title>
+  <dc:creator>Shashank Shekhar</dc:creator>
+  <link>https://shashankshekhar.me/posts/linear-regression/Linear_Regression.html</link>
+  <description><![CDATA[ 
+
+
+
+
+<p>In this blog I am going to explain Regression, it’s type, and how can we code a Linear Regression from scratch in Python. First we will look at the concepts and maths behing this algorithm and then we will implement it using <code>Python</code>, <code>NumPy</code> and <code>Pandas</code>.</p>
+<p><strong>By the end of this blog you will bw able to understand:</strong></p>
+<ol type="1">
+<li>What is Regression and classification?</li>
+<li>Difference between Linear Regression and Non-Linear Regression.</li>
+<li>Hyothesis(model) of Linear Regression</li>
+<li>Cost function</li>
+<li>Gradient Descent</li>
+<li>How to code all these equation and algorithm in Python?</li>
+</ol>
+<p><img src="https://shashankshekhar.me/posts/linear-regression/1.png" class="img-fluid"></p>
+<section id="regression-vs-classification" class="level4">
+<h4 class="anchored" data-anchor-id="regression-vs-classification">Regression vs Classification</h4>
+<p>In Machine Learning, If the output variable has continous range, and we have to find the relationship between the the input and output variable(s). This is called <em>Regression</em>. Examples include - House Price, Salary, etc</p>
+<p>In contrast, if the the output has descrete range. It is then called <em>Classification</em>. Examples include - Cat vs Dog, Spam/Not Spam, etc</p>
+<p>These regresssion models can be used for both Inference and Prediction.</p>
+<p>In this blog we are focused to get Prediction using Regression.</p>
+</section>
+<section id="regression" class="level4">
+<h4 class="anchored" data-anchor-id="regression">Regression</h4>
+<p>Regression in itself can be of multiple types - Linear and Non-Linear Regression.</p>
+<p><code>Linear Regression</code> - When the model relates the input(independent) and output(dependent) varibale in straight line. <em>Simple Linear Regression</em> is subset of the prior, when there is only single input variable is present.</p>
+<p><code>Non-Linear Regression</code> - When the model relates the input and output varibale in curved line.</p>
+<p>I am thowing a lot of jargons here so let me clarify few things before moving forward.</p>
+<ul>
+<li><p><em>Input Variable/Independent Variable/Feature</em> are used interchangibly. In ML context these are the values which we are going to have to make the Prediction. For example :- For House Price Prediction we need Size. Size is the Input/Feature.</p></li>
+<li><p><em>Output Varibale/Dependent Varibale/Target</em> are those values which we are need to predict. <em>Price</em> is the target in case of the last example.</p></li>
+</ul>
+</section>
+<section id="linear-regression" class="level4">
+<h4 class="anchored" data-anchor-id="linear-regression">Linear Regression</h4>
+<p>In this blog we are going to implement <em>Simple Linear Regression</em> on a small <code>dataset</code>. The information about the dataset is given below.</p>
+<div class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><span class="co" style="color: #5E5E5E;"># Imports</span></span>
+<span id="cb1-2"><span class="im" style="color: #00769E;">import</span> numpy <span class="im" style="color: #00769E;">as</span> np</span>
+<span id="cb1-3"><span class="im" style="color: #00769E;">import</span> pandas <span class="im" style="color: #00769E;">as</span> pd</span>
+<span id="cb1-4"><span class="im" style="color: #00769E;">import</span> matplotlib.pyplot <span class="im" style="color: #00769E;">as</span> plt</span></code></pre></div>
+</div>
+<p>We are using a small dataset from <a href="https://college.cengage.com/mathematics/brase/understandable_statistics/7e/students/datasets/slr/frames/frame.html">here</a>. This a data about Cricket Chirps Vs. Temperature. We will use linear regression to fit model.</p>
+<div class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb2" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><span class="co" style="color: #5E5E5E;"># loading data</span></span>
+<span id="cb2-2">data <span class="op" style="color: #5E5E5E;">=</span> pd.read_excel(<span class="st" style="color: #20794D;">'slr02.xls'</span>, engine<span class="op" style="color: #5E5E5E;">=</span><span class="st" style="color: #20794D;">'xlrd'</span>)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>*** No CODEPAGE record, no encoding_override: will use 'iso-8859-1'</code></pre>
+</div>
+</div>
+<p>Now we look into data we see there are two columns <code>X</code> and <code>Y</code>, were<br>
+<code>X = chirps/sec for the striped ground cricket</code><br>
+<code>Y = temperature in degrees Fahrenheit</code></p>
+<div class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb4" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><span class="co" style="color: #5E5E5E;"># visualise data</span></span>
+<span id="cb4-2">data.head()</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="3">
+
+<div>
+
+<table class="dataframe table table-sm table-striped">
+  <thead>
+    <tr>
+      <th></th>
+      <th>X</th>
+      <th>Y</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>20.000000</td>
+      <td>88.599998</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>16.000000</td>
+      <td>71.599998</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>19.799999</td>
+      <td>93.300003</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>18.400000</td>
+      <td>84.300003</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>17.100000</td>
+      <td>80.599998</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb5" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><span class="co" style="color: #5E5E5E;"># data we got are in pandas dataframe format</span></span>
+<span id="cb5-2"><span class="co" style="color: #5E5E5E;"># we need to cast it in numpy array for calulations</span></span>
+<span id="cb5-3">X <span class="op" style="color: #5E5E5E;">=</span> np.array(data.X)</span>
+<span id="cb5-4">Y <span class="op" style="color: #5E5E5E;">=</span> np.array(data.Y)</span></code></pre></div>
+</div>
+<div class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb6" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><span class="co" style="color: #5E5E5E;"># Now we have two arrays. One containing input features and other array has output features</span></span>
+<span id="cb6-2"><span class="co" style="color: #5E5E5E;"># visualise casted data</span></span>
+<span id="cb6-3"><span class="bu" style="color: null;">print</span>(X,Y)</span>
+<span id="cb6-4"><span class="bu" style="color: null;">print</span>(<span class="st" style="color: #20794D;">"Data points:"</span>, <span class="bu" style="color: null;">len</span>(X))</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[20.         16.         19.79999924 18.39999962 17.10000038 15.5
+ 14.69999981 17.10000038 15.39999962 16.20000076 15.         17.20000076
+ 16.         17.         14.39999962] [88.59999847 71.59999847 93.30000305 84.30000305 80.59999847 75.19999695
+ 69.69999695 82.         69.40000153 83.30000305 79.59999847 82.59999847
+ 80.59999847 83.5        76.30000305]
+Data points: 15</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb8" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><span class="co" style="color: #5E5E5E;"># function for plotting data points</span></span>
+<span id="cb8-2"><span class="kw" style="color: #003B4F;">def</span> plot_points(X, Y, xlabel, ylabel):</span>
+<span id="cb8-3">    <span class="co" style="color: #5E5E5E;">"""Plot points given X and Y co-ordinates and labels them"""</span></span>
+<span id="cb8-4">    plt.plot(X, Y, <span class="st" style="color: #20794D;">'o'</span>)</span>
+<span id="cb8-5">    plt.xlabel(xlabel)</span>
+<span id="cb8-6">    plt.ylabel(ylabel)</span></code></pre></div>
+</div>
+<p>This is the scatter-plot visualization of the data we have used. On X-axis we have chirps/sec and on the Y-axis we have Temperature.</p>
+<div class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb9" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><span class="co" style="color: #5E5E5E;"># plot data points</span></span>
+<span id="cb9-2">plot_points(X, Y, <span class="st" style="color: #20794D;">"chirps/sec for the striped ground cricket"</span>, <span class="st" style="color: #20794D;">"temperature in degrees Fahrenheit"</span>)</span></code></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="https://shashankshekhar.me/posts/linear-regression/Linear_Regression_files/figure-html/cell-8-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+</section>
+<section id="linear-regression-hypothesismodel" class="level3">
+<h3 class="anchored" data-anchor-id="linear-regression-hypothesismodel">Linear Regression hypothesis/model</h3>
+<p>As mentioned earlier in the definition, <em>Linear Regression</em> is a way to find relationship between the input varibale (chirps/sec) and output varibale (temperature) with the help of a straight line.</p>
+<p>Our main objective is to fit a straight line though these data points. As we can see the input and output are linearly dependent (as input varibale value increases/decrease, output variable value also tend to increase/decrease).</p>
+<p><strong><em>Objective</em></strong> : <em>To find a best fit straight line through data points</em></p>
+<p>Best fit implies that the distance between the points and line should be minimum.</p>
+<p><img src="https://shashankshekhar.me/posts/linear-regression/2.png" class="img-fluid"></p>
+<p>In the figure, <img src="https://latex.codecogs.com/png.latex?d_1,d_2,d_3,....,%20d_n"> represents the distance between the point and the line and our goal is to minimize the sum of these distances.</p>
+<p><strong>Hypothesis Function:</strong> A stright line can be represented like <img src="https://latex.codecogs.com/png.latex?h_%7B%5Ctheta%7D(x)=%7B%5Ctheta%7D_0%20+%20%7B%5Ctheta%7D_1x">. Where <img src="https://latex.codecogs.com/png.latex?%7B%5Ctheta%7D_0"> is the intercept and <img src="https://latex.codecogs.com/png.latex?%7B%5Ctheta%7D_1"> is the slope of the line. We have to find this <img src="https://latex.codecogs.com/png.latex?%7B%5Ctheta%7D_0"> and <img src="https://latex.codecogs.com/png.latex?%7B%5Ctheta%7D_1"><br>
+</p>
+<p>Before moving forward, These are some conventions we have taken for varibale names and mathematical equations.</p>
+<p><img src="https://latex.codecogs.com/png.latex?m"> : number of training examples (m=15, in this case)<br>
+<img src="https://latex.codecogs.com/png.latex?X"> : input / features<br>
+<img src="https://latex.codecogs.com/png.latex?Y"> : output/ target<br>
+<img src="https://latex.codecogs.com/png.latex?x%5E%7B(i)%7D,%20y%5E%7B(i)%7D"> : <img src="https://latex.codecogs.com/png.latex?i%5E%7Bth%7D"> training data.<br>
+<img src="https://latex.codecogs.com/png.latex?%7B%5Ctheta%7D_0"> ,<img src="https://latex.codecogs.com/png.latex?%7B%5Ctheta%7D_1">: Model Parameters / Weights</p>
+<div class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb10" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><span class="co" style="color: #5E5E5E;"># initialised random thetas</span></span>
+<span id="cb10-2">np.random.seed(<span class="dv" style="color: #AD0000;">2</span>)</span>
+<span id="cb10-3">theta <span class="op" style="color: #5E5E5E;">=</span> np.random.rand(<span class="dv" style="color: #AD0000;">2</span>,<span class="dv" style="color: #AD0000;">1</span>)</span>
+<span id="cb10-4"><span class="co" style="color: #5E5E5E;"># hypothesis of model</span></span>
+<span id="cb10-5"><span class="kw" style="color: #003B4F;">def</span> hypothesis(X, theta):</span>
+<span id="cb10-6">    <span class="co" style="color: #5E5E5E;">"""Predicts output feature given input feature and theta"""</span></span>
+<span id="cb10-7">    <span class="cf" style="color: #003B4F;">return</span> theta[<span class="dv" style="color: #AD0000;">0</span>] <span class="op" style="color: #5E5E5E;">+</span> theta[<span class="dv" style="color: #AD0000;">1</span>] <span class="op" style="color: #5E5E5E;">*</span> X</span></code></pre></div>
+</div>
+<p>Let’s plot the initial line to check how ot fits our data.</p>
+<div class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb11" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><span class="co" style="color: #5E5E5E;"># plots line of regression</span></span>
+<span id="cb11-2"><span class="kw" style="color: #003B4F;">def</span> draw_line(theta, X):</span>
+<span id="cb11-3">    <span class="co" style="color: #5E5E5E;">"""Plot a line from slope and intercept"""</span></span>
+<span id="cb11-4">    x_vals <span class="op" style="color: #5E5E5E;">=</span> X</span>
+<span id="cb11-5">    y_vals <span class="op" style="color: #5E5E5E;">=</span> hypothesis(x_vals, theta)</span>
+<span id="cb11-6">    plt.plot(x_vals, y_vals, <span class="st" style="color: #20794D;">'--'</span>)</span></code></pre></div>
+</div>
+<p>We want to plot data points and line of regession on same plot to see if we are progressing as we train our model</p>
+<div class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb12" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><span class="co" style="color: #5E5E5E;"># plots points and lines</span></span>
+<span id="cb12-2"><span class="kw" style="color: #003B4F;">def</span> draw_points_and_lines(X, Y, xlabel, ylabel, theta):</span>
+<span id="cb12-3">    <span class="co" style="color: #5E5E5E;">"""Draws lines and points"""</span></span>
+<span id="cb12-4">    plot_points(X, Y, xlabel, ylabel)</span>
+<span id="cb12-5">    draw_line(theta, X)</span></code></pre></div>
+</div>
+<p>Now without training our model let’s were the line of regression lies</p>
+<div class="cell" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb13" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><span class="co" style="color: #5E5E5E;"># draw line of regression without traing model</span></span>
+<span id="cb13-2">draw_points_and_lines(X, Y, <span class="st" style="color: #20794D;">"chirps/sec for the striped ground cricket"</span>, <span class="st" style="color: #20794D;">"temperature in degrees Fahrenheit"</span>, theta)</span></code></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="https://shashankshekhar.me/posts/linear-regression/Linear_Regression_files/figure-html/cell-12-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+</section>
+<section id="cost-function" class="level3">
+<h3 class="anchored" data-anchor-id="cost-function">Cost Function</h3>
+<p>Cost function givies us measure of how much we are error the hypothesis is making? These <em>errors</em> are measured as mean of squared error( <img src="https://latex.codecogs.com/png.latex?d_1,d_2,d_3,....,%20d_n">) terms.<br>
+</p>
+<p>We will be using squared error cost function which is formulated as,<br>
+</p>
+<p><img src="https://latex.codecogs.com/png.latex?d_%7Bi%7D%20=%20h_%7B%5Ctheta%7D(x%5E%7B(i)%7D)%20-%20y%5E%7B(i)%7D">(error)<br>
+errors can be both postive and negetive in direction so, we sqaure this error term to make all the error terms positive(+ve).<br>
+<img src="https://latex.codecogs.com/png.latex?(d_%7Bi%7D)%5E2%20=%20(h_%7B%5Ctheta%7D(x%5E%7B(i)%7D)%20-%20y%5E%7B(i)%7D)%5E2">(squared error)<br>
+We need to the line which minimizes the mean of these squared error terms.</p>
+<p>Cost function - (<em>Mean Sqaured Error</em>) <img src="https://latex.codecogs.com/png.latex?J(%7B%7B%5Ctheta%7D_0,%20%7B%5Ctheta%7D_1%7D)%20=%20%20%5Cfrac%7B1%7D%7B2m%7D%5Csum_%7Bi=0%7D%5E%7Bi=n-1%7D(h_%7B%5Ctheta%7D(x%5E%7B(i)%7D)%20-%20y%5E%7B(i)%7D)%5E2"></p>
+<p><em>Note:- Mean Squared Error is divided by 2 beacuse it will later help when finding gradient of the function</em></p>
+<p>We need to minimize this Cost function with respect to <img src="https://latex.codecogs.com/png.latex?%7B%5Ctheta%7D_0,%20%7B%5Ctheta%7D_1">. After optimization, it will give us the value of parameters(thetas) which in turn will give us the best fit line.</p>
+<div class="cell" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb14" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><span class="co" style="color: #5E5E5E;"># cost function</span></span>
+<span id="cb14-2">m <span class="op" style="color: #5E5E5E;">=</span> <span class="bu" style="color: null;">len</span>(X)</span>
+<span id="cb14-3"><span class="kw" style="color: #003B4F;">def</span> cost(X, Y, theta):</span>
+<span id="cb14-4">    <span class="co" style="color: #5E5E5E;">"""Returns cost"""</span></span>
+<span id="cb14-5">    <span class="cf" style="color: #003B4F;">return</span> (<span class="dv" style="color: #AD0000;">1</span><span class="op" style="color: #5E5E5E;">/</span>(<span class="dv" style="color: #AD0000;">2</span><span class="op" style="color: #5E5E5E;">*</span>m)) <span class="op" style="color: #5E5E5E;">*</span> np.<span class="bu" style="color: null;">sum</span>((hypothesis(X, theta) <span class="op" style="color: #5E5E5E;">-</span> Y) <span class="op" style="color: #5E5E5E;">**</span> <span class="dv" style="color: #AD0000;">2</span>)</span></code></pre></div>
+</div>
+<div class="cell" data-execution_count="13">
+<div class="sourceCode cell-code" id="cb15" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><span class="co" style="color: #5E5E5E;"># initial cost without trraining model</span></span>
+<span id="cb15-2">cost(X, Y, theta)</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="13">
+<pre><code>3154.8870744571304</code></pre>
+</div>
+</div>
+<p>We have now defined a Cost function which tells us how wrong we are from actual label(target). The less the cost - the better. Right now with just random value of theta we have attained a very gigh cost. We need to minimize it. In this blog we are going to use a technique called <em>Gradient Descent</em> for minimization of the cost function.</p>
+</section>
+<section id="gradient-descent-model-training" class="level3">
+<h3 class="anchored" data-anchor-id="gradient-descent-model-training">Gradient Descent / Model Training</h3>
+<p>Gradient Descent is the optimization algorithm used to finding the value of paramerter which minimizes the value of <em>cost function</em>. In our case we are minimizing MSE Cost function with the help of this algorithm.</p>
+<p>This algorithm works by iteratively updating the values of the parameters(thetas) in the direction of the negative gradient of the cost function with respect to the parameters. This means that at each iteration, the parameters are updated in the direction that reduces the value of the cost function.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="https://shashankshekhar.me/posts/linear-regression/3.png" class="img-fluid figure-img"></p>
+<p></p><figcaption class="figure-caption">Representation of Gradient Descent in 2D Plane(for simlification of understaing). Here Cost is just function for single theta. Steps are taken in the direction opposite to the gradient/slope. Learning rate decides the step size. In this image the gradient is +ve, hence the steps taken will be in negative direction.</figcaption><p></p>
+</figure>
+</div>
+<p>The <em>learning rate(denoted by alpha, <img src="https://latex.codecogs.com/png.latex?%5Calpha">)</em> is the one of the hyperparameter(parameter, for which the value needs to decided manually). We need to set learning rate very carefully, It decides the step size in the negative direction of the gradient(slope).<br>
+A higher learning rate can lead to faster convergence, but can also make the algorithm more likely to overshoot the minimum. A lower learning rate can be more stable, but can also lead to slower convergence.</p>
+<p>To make a analogy, We can think Gradient descent algorithm like - We are blindfolded and descesnding from a hill(cost function). We will take a step forward evaulate the slope(gradient) and then move according to that. When we will reach bottom of the hill, then the step in any direction will take us upward and thus we know that be have reaced bottom(convergence).</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="https://shashankshekhar.me/posts/linear-regression/4.png" class="img-fluid figure-img"></p>
+<p></p><figcaption class="figure-caption">Gradeint Descent in 3D plane, extension of previous image in both parameter</figcaption><p></p>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="https://shashankshekhar.me/posts/linear-regression/5.png" class="img-fluid figure-img"></p>
+<p></p><figcaption class="figure-caption">Mathematical equation for Gradient descent, parameters need to be updated by finding slope of the cost function w.r.t each parameter.</figcaption><p></p>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="https://shashankshekhar.me/posts/linear-regression/6.png" class="img-fluid figure-img"></p>
+<p></p><figcaption class="figure-caption">Equation if Gradient Descent - After finding the gradient of cost function w.r.t <img src="https://latex.codecogs.com/png.latex?%5Ctheta_0%20and%20%5Ctheta_1"></figcaption><p></p>
+</figure>
+</div>
+<div class="cell" data-execution_count="14">
+<div class="sourceCode cell-code" id="cb17" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><span class="co" style="color: #5E5E5E;"># minimize cost through gradient descent - Model training</span></span>
+<span id="cb17-2"><span class="kw" style="color: #003B4F;">def</span> gradient_descent(X, Y, theta, alpha, steps):</span>
+<span id="cb17-3">    <span class="cf" style="color: #003B4F;">for</span> i <span class="kw" style="color: #003B4F;">in</span> <span class="bu" style="color: null;">range</span>(steps):</span>
+<span id="cb17-4">        old_cost <span class="op" style="color: #5E5E5E;">=</span> cost(X, Y, theta)</span>
+<span id="cb17-5">        grad0 <span class="op" style="color: #5E5E5E;">=</span> ((<span class="dv" style="color: #AD0000;">1</span><span class="op" style="color: #5E5E5E;">/</span>m) <span class="op" style="color: #5E5E5E;">*</span> np.<span class="bu" style="color: null;">sum</span>(hypothesis(X, theta) <span class="op" style="color: #5E5E5E;">-</span> Y))</span>
+<span id="cb17-6">        grad1 <span class="op" style="color: #5E5E5E;">=</span> ((<span class="dv" style="color: #AD0000;">1</span><span class="op" style="color: #5E5E5E;">/</span>m) <span class="op" style="color: #5E5E5E;">*</span> np.dot((hypothesis(X, theta) <span class="op" style="color: #5E5E5E;">-</span> Y), X))</span>
+<span id="cb17-7">        temp0 <span class="op" style="color: #5E5E5E;">=</span> theta[<span class="dv" style="color: #AD0000;">0</span>] <span class="op" style="color: #5E5E5E;">-</span> alpha <span class="op" style="color: #5E5E5E;">*</span> grad0</span>
+<span id="cb17-8">        temp1 <span class="op" style="color: #5E5E5E;">=</span> theta[<span class="dv" style="color: #AD0000;">1</span>] <span class="op" style="color: #5E5E5E;">-</span> alpha <span class="op" style="color: #5E5E5E;">*</span> grad1</span>
+<span id="cb17-9">        theta[<span class="dv" style="color: #AD0000;">0</span>] <span class="op" style="color: #5E5E5E;">=</span> temp0</span>
+<span id="cb17-10">        theta[<span class="dv" style="color: #AD0000;">1</span>] <span class="op" style="color: #5E5E5E;">=</span> temp1</span>
+<span id="cb17-11">        new_cost <span class="op" style="color: #5E5E5E;">=</span> cost(X, Y, theta)</span>
+<span id="cb17-12">        <span class="cf" style="color: #003B4F;">if</span> i<span class="op" style="color: #5E5E5E;">%</span><span class="dv" style="color: #AD0000;">10</span> <span class="op" style="color: #5E5E5E;">==</span> <span class="dv" style="color: #AD0000;">0</span>:    <span class="co" style="color: #5E5E5E;">#print every 10th epoch</span></span>
+<span id="cb17-13">            <span class="cf" style="color: #003B4F;">if</span> new_cost <span class="op" style="color: #5E5E5E;">&gt;</span> old_cost:</span>
+<span id="cb17-14">                <span class="bu" style="color: null;">print</span>(<span class="st" style="color: #20794D;">"WARNING!!! COST INCREASING"</span>)</span>
+<span id="cb17-15">            <span class="cf" style="color: #003B4F;">else</span>:</span>
+<span id="cb17-16">                <span class="bu" style="color: null;">print</span>(<span class="st" style="color: #20794D;">"Cost Decresing"</span>, new_cost)</span></code></pre></div>
+</div>
+<div class="cell" data-execution_count="15">
+<div class="sourceCode cell-code" id="cb18" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><span class="co" style="color: #5E5E5E;"># train model of 150 iterations</span></span>
+<span id="cb18-2">gradient_descent(X, Y, theta, alpha<span class="op" style="color: #5E5E5E;">=</span><span class="fl" style="color: #AD0000;">0.0001</span>, steps<span class="op" style="color: #5E5E5E;">=</span><span class="dv" style="color: #AD0000;">200</span>)</span>
+<span id="cb18-3">theta</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Cost Decresing 2980.5693134787443
+Cost Decresing 1689.4327589238676
+Cost Decresing 959.3382749612664
+Cost Decresing 546.4942831760693
+Cost Decresing 313.0448146583842
+Cost Decresing 181.03693810660252
+Cost Decresing 106.39088282551906
+Cost Decresing 64.18101546051345
+Cost Decresing 40.31272552858337
+Cost Decresing 26.815983067351162
+Cost Decresing 19.184003183555753
+Cost Decresing 14.868350028147061
+Cost Decresing 12.427968518501714
+Cost Decresing 11.047990290588316
+Cost Decresing 10.267634588205215
+Cost Decresing 9.826345333024406
+Cost Decresing 9.576786793160268
+Cost Decresing 9.435645548985352
+Cost Decresing 9.35581065326909
+Cost Decresing 9.310642443891272</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="15">
+<pre><code>array([[0.72065763],
+       [4.73296698]])</code></pre>
+</div>
+</div>
+<p>After training we can clearly see we have reduced cost, and the cost has converged at a a fixed place, training it furteher will not lead lower cost, thus we can stop the furter interations. We have now found those parameters which gave us minimized cost.</p>
+<div class="cell" data-execution_count="16">
+<div class="sourceCode cell-code" id="cb21" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><span class="co" style="color: #5E5E5E;"># cost after traing model</span></span>
+<span id="cb21-2">cost(X, Y, theta)</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="16">
+<pre><code>9.287030172925407</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="17">
+<div class="sourceCode cell-code" id="cb23" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><span class="co" style="color: #5E5E5E;"># value of theta after training </span></span>
+<span id="cb23-2">theta</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="17">
+<pre><code>array([[0.72065763],
+       [4.73296698]])</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="18">
+<div class="sourceCode cell-code" id="cb25" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><span class="co" style="color: #5E5E5E;"># regression line after traing model</span></span>
+<span id="cb25-2">draw_points_and_lines(X, Y, <span class="st" style="color: #20794D;">"chirps/sec for the striped ground cricket"</span>, <span class="st" style="color: #20794D;">"temperature in degrees Fahrenheit"</span>, theta)</span></code></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="https://shashankshekhar.me/posts/linear-regression/Linear_Regression_files/figure-html/cell-19-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+<p>We can clearly see we have fitted line to the points. Thus we have successfully used linear regression to train a model.</p>
+</section>
+<section id="predictioninference" class="level3">
+<h3 class="anchored" data-anchor-id="predictioninference">Prediction/Inference</h3>
+<p>Now that we have found the appropriate line of fit through thsese points. We can also use this line to infer values on input values(chirps/sec) which are not present in the training data.</p>
+<div class="cell" data-execution_count="25">
+<div class="sourceCode cell-code" id="cb26" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><span class="co" style="color: #5E5E5E;"># Temprature when 19 chirps/sec</span></span>
+<span id="cb26-2">x <span class="op" style="color: #5E5E5E;">=</span> np.array([<span class="dv" style="color: #AD0000;">19</span>])</span>
+<span id="cb26-3"><span class="bu" style="color: null;">print</span>(<span class="ss" style="color: #20794D;">f"Predicted temprature when ground cricket chips 19 times a sec is </span><span class="sc" style="color: #5E5E5E;">{</span>hypothesis(x, theta)[<span class="dv" style="color: #AD0000;">0</span>]<span class="sc" style="color: #5E5E5E;">}</span><span class="ss" style="color: #20794D;"> degrees Farenheight."</span>)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Predicted temprature when ground cricket chips 19 times a sec is 90.64703016147293 degrees Farenheight.</code></pre>
+</div>
+</div>
+
+
+</section>
+
+ ]]></description>
+  <category>Machine Learning</category>
+  <category>Python</category>
+  <guid>https://shashankshekhar.me/posts/linear-regression/Linear_Regression.html</guid>
+  <pubDate>Sat, 26 Nov 2022 18:30:00 GMT</pubDate>
+  <media:content url="https://shashankshekhar.me/posts/linear-regression/1.png" medium="image" type="image/png" height="74" width="144"/>
+</item>
+<item>
+  <title>Deploy ML Application on Azure App Service</title>
+  <dc:creator>Shashank Shekhar</dc:creator>
+  <link>https://shashankshekhar.me/posts/deploy-on-web-app/index.html</link>
+  <description><![CDATA[ 
+
+
+
+
+<p>In this blog, I am going to show how to deploy a Machine Learning API on Azure App Service. I am assuming that you have trained your model, wrapped it into the API, and the API is running on the local machine. For this blog, I have trained a deep-learning model with help of PyTorch. The API I am going to deploy is a simple Cat vs Dog Classification API, which takes input images and returns if it is a cat or dog. <img src="https://shashankshekhar.me/posts/deploy-on-web-app/0.png" class="img-fluid" data-fig-align="center"> <strong>By the end of this blog you will be able to understand:</strong></p>
+<ol type="1">
+<li>How to create an Azure Web App</li>
+<li>Difference between Azure Web App and App Service.</li>
+<li>Deploy your API on the Azure Web App</li>
+<li>Test your deployment</li>
+<li>Bonus: How to connect the front-end to the API running on Web App.</li>
+</ol>
+<p><strong>Prerequisites:</strong></p>
+<ol type="1">
+<li>An Flask/FastAPI API is running locally.</li>
+<li>Postman - for API Testing</li>
+<li>Azure Account (Obviously!)</li>
+</ol>
+<p>This is my folder structure. Out of these files 3 are important for deployment.</p>
+<ol type="1">
+<li><code>app.py</code> - Code for API is present here</li>
+<li><code>res18_10.pth</code> - PyTorch trained model</li>
+<li><code>requirement.txt</code> - contains the dependent packages.( If you don’t have this. You can get them doing pip freeze in the virtual environment)</li>
+</ol>
+<p>All these files can be found here if want to look in more details Github repo: <a href="https://github.com/shashank2806/simple-classifier-demo" class="uri">https://github.com/shashank2806/simple-classifier-demo</a></p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="https://shashankshekhar.me/posts/deploy-on-web-app/1.png" class="img-fluid figure-img"></p>
+<p></p><figcaption class="figure-caption"><em>Files in the directory</em></figcaption><p></p>
+</figure>
+</div>
+<section id="step-0-test-the-api-locally." class="level3">
+<h3 class="anchored" data-anchor-id="step-0-test-the-api-locally.">Step 0 : Test the API locally.</h3>
+<ol type="1">
+<li><p>Test the API in the virtual environment you have developed it. If you have not developed it in a virtual environment, I would strongly suggest that you create one and install all the dependencies into it using <code>requirements.txt</code>.</p></li>
+<li><p>Test it on postman.</p></li>
+</ol>
+<p>This is my API running locally on postman, it has route named ‘/pred’ which takes images as from-data.</p>
+<p><em>This is the response when I upload this image of the cat. The model predicts it is a cat, cool.</em></p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="https://shashankshekhar.me/posts/deploy-on-web-app/cat.jpg" class="img-fluid figure-img"></p>
+<p></p><figcaption class="figure-caption"><em>Input image of cat</em></figcaption><p></p>
+</figure>
+</div>
+<p>As I have tested the API on my machine. Now it is ready for deployment. <img src="https://shashankshekhar.me/posts/deploy-on-web-app/2.png" class="img-fluid" data-fig-align="center" alt="API testing though postman on localhost"></p>
+</section>
+<section id="step---1-create-azure-resources" class="level3">
+<h3 class="anchored" data-anchor-id="step---1-create-azure-resources">Step - 1: Create Azure Resources</h3>
+<p>I am now going to create an Azure web app. A web app is the quickest method to deploy your APIs on the cloud. It supports both code and docker containers. In this blog, we are focusing on deployment through code.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="https://shashankshekhar.me/posts/deploy-on-web-app/3.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+<p>Create a web app on the Azure portal. Select the subscription and Resource Group. You need to give it a unique name. Select OS and your python version. In my case, I have selected 3.10. Select the region.</p>
+<p>Now we have to select a <strong>app service plan</strong>. Most people have confusion between web app and app service.(Even both terms are used interchangeably) <em>App service is the hardware on which you web app is deployed.</em> Single App service can host multiple web apps. Keep this in mind when selecting your app service plan. I am selecting B1 plan, which is capable enough to host this API.</p>
+<p><img src="https://shashankshekhar.me/posts/deploy-on-web-app/4.png" class="img-fluid" data-fig-align="center"> <img src="https://shashankshekhar.me/posts/deploy-on-web-app/5.png" class="img-fluid" data-fig-align="center"></p>
+<p>Click <strong>Review+Create</strong></p>
+<p>The web app is created. A URL is also assigned - <a href="https://pytorch-demo.azurewebsites.net/" class="uri">https://pytorch-demo.azurewebsites.net/</a></p>
+<p>This is the URL where the web app will be hosted, There is nothing there right now.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="https://shashankshekhar.me/posts/deploy-on-web-app/6.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</section>
+<section id="step-2-push-code-to-the-web-app" class="level3">
+<h3 class="anchored" data-anchor-id="step-2-push-code-to-the-web-app">Step 2: Push code to the Web App</h3>
+<ol type="1">
+<li><p>On the Azure Portal, go to the Deployment centre and select local git as the deployment source. You will get the git clone path, and username and password in the Credentials tab. Tip: The username is just <code>${web app name}</code>, in my case <code>$pytorch-demo</code>, Do not enter the full username provided. <img src="https://shashankshekhar.me/posts/deploy-on-web-app/7.png" class="img-fluid" data-fig-align="center"></p></li>
+<li><p>Go to the directory containing the code. You can also test it on my demo code. Clone the github repo using <code>git clone https://github.com/shashank2806/simple-classifier-demo.git</code> You need <code>git</code> to be initialised (<code>git init</code>) in the directory, and commit (<code>git commit</code>) the changes you want to be uploaded.</p></li>
+<li><p>Add a new <code>remote</code> to push code. I had initially one remote(<code>origin</code>) pointing to my Github. I have added new remote named <code>azure</code> which connects to web app. Use <code>git remote add &lt;git-clone-uri&gt;</code> to add remote. <img src="https://shashankshekhar.me/posts/deploy-on-web-app/8.png" class="img-fluid" data-fig-align="center"></p></li>
+<li><p>Now push the code to Azure using - <code>git push azure master</code> <img src="https://shashankshekhar.me/posts/deploy-on-web-app/9.png" class="img-fluid" data-fig-align="center"></p></li>
+<li><p>Now wait for few minutes, you can see the logs on the screen. Wait until the deployment succeeds.</p></li>
+</ol>
+<p><strong>Voila</strong> The deplyment to the cloud is done! Now we can test it on postman.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="https://shashankshekhar.me/posts/deploy-on-web-app/10.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+<p>Great!! As you can see, We have deployed the API over the cloud, now anyone can access it. We just need to give the user Endpoint and Key.</p>
+</section>
+<section id="step-3-bonus--connect-it-with-the-front-end." class="level3">
+<h3 class="anchored" data-anchor-id="step-3-bonus--connect-it-with-the-front-end.">Step 3: Bonus- Connect it with the front-end.</h3>
+<p>We have deployed our backend API on the web app. As you may have noticed there is an <code>index.html</code> in the directory. This contains a very simple front-end. We can connect the back-end API to the front-end.</p>
+<p>The <code>index.html</code> is hosted through GitHub Pages(free hosting). The the hosted URL is <a href="https://shashankshekhar.me/simple-classifier-demo/" class="uri">https://shashankshekhar.me/simple-classifier-demo/</a></p>
+<p>If you look into index.html, You will find a JavaScript - Fetch is used for calling the API. (You can get the code snippet to connect with help of postman.)</p>
+<div class="sourceCode" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode javascript code-with-copy"><code class="sourceCode javascript"><span id="cb1-1">    <span class="kw" style="color: #003B4F;">var</span> requestOptions <span class="op" style="color: #5E5E5E;">=</span> {</span>
+<span id="cb1-2">        <span class="dt" style="color: #AD0000;">method</span><span class="op" style="color: #5E5E5E;">:</span> <span class="st" style="color: #20794D;">"POST"</span><span class="op" style="color: #5E5E5E;">,</span></span>
+<span id="cb1-3">        <span class="dt" style="color: #AD0000;">body</span><span class="op" style="color: #5E5E5E;">:</span> formData<span class="op" style="color: #5E5E5E;">,</span></span>
+<span id="cb1-4">        <span class="dt" style="color: #AD0000;">redirect</span><span class="op" style="color: #5E5E5E;">:</span> <span class="st" style="color: #20794D;">"follow"</span><span class="op" style="color: #5E5E5E;">,</span></span>
+<span id="cb1-5">    }<span class="op" style="color: #5E5E5E;">;</span></span>
+<span id="cb1-6"></span>
+<span id="cb1-7">    <span class="co" style="color: #5E5E5E;">// Change endpoint here</span></span>
+<span id="cb1-8">    <span class="fu" style="color: #4758AB;">fetch</span>(<span class="st" style="color: #20794D;">"https://pytorch-demo.azurewebsites.net/pred"</span><span class="op" style="color: #5E5E5E;">,</span> requestOptions)</span></code></pre></div>
+<p>You can make some minor changes on this front-end to tailor it to your need. I have changed the Endpoint URL to the web app.</p>
+<p>Let’s try with our cat image. On this front-end.</p>
+<p><img src="https://shashankshekhar.me/posts/deploy-on-web-app/11.png" class="img-fluid" data-fig-align="center"> Voila! We have got the result, The API is taking to the font-end, the request we are making on our web browser is going to our API and fetching the results from there.</p>
+<p><em>The API might not be responsing by the time you are looking at this web page - I will delete the App Service later.</em></p>
+</section>
+<section id="final-words" class="level3">
+<h3 class="anchored" data-anchor-id="final-words">Final Words</h3>
+<p>We now know:</p>
+<ol type="1">
+<li>How to deploy your API on the Azure app service</li>
+<li>Test the API through Postman</li>
+<li>How to connect it to the front end. (or how to communicate with the frontend engineer about your ML API. Give them, endpoints, routes and keys/schema)</li>
+</ol>
+<p>This method will work in most cases, where there are not complex dependencies, sometimes, there are OS-based dependencies for which we will have to deploy through Docker.</p>
+<p><strong><em>Enjoy. Happy Learning!!!</em></strong></p>
+
+
+</section>
+
+ ]]></description>
+  <category>Azure</category>
+  <category>Flask</category>
+  <category>API</category>
+  <guid>https://shashankshekhar.me/posts/deploy-on-web-app/index.html</guid>
+  <pubDate>Sat, 19 Nov 2022 18:30:00 GMT</pubDate>
+  <media:content url="https://shashankshekhar.me/posts/deploy-on-web-app/0.png" medium="image" type="image/png" height="47" width="144"/>
+</item>
+<item>
+  <title>Welcome To My Blog</title>
+  <dc:creator>Shashank Shekhar</dc:creator>
+  <link>https://shashankshekhar.me/posts/welcome/index.html</link>
+  <description><![CDATA[ 
+
+
+
+
+<p>This is my first blog. Welcome!</p>
+<p><img src="https://shashankshekhar.me/posts/welcome/thumbnail.jpg" class="img-fluid"></p>
+<p>This is start of my bloging journey. I will writing about Deep Learning and this assciated with it. The topics I would like to write about in near future are - Computer Vision, NLP, Machine Learning on Azure Cloud, Deployment of ML Application on Azure Cloud, MLOps.</p>
+<p>With this I am also takaing a 12-Week Blog Challenge, where ober the course of next 12 Weeks I will be writing - (atleast)1 Blog a week.</p>
+
+
+
+ ]]></description>
+  <category>news</category>
+  <guid>https://shashankshekhar.me/posts/welcome/index.html</guid>
+  <pubDate>Sat, 12 Nov 2022 18:30:00 GMT</pubDate>
+  <media:content url="https://shashankshekhar.me/posts/welcome/thumbnail.jpg" medium="image" type="image/jpeg"/>
+</item>
+</channel>
+</rss>

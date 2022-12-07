@@ -1,0 +1,15 @@
+---
+title: "Welcome To My Blog"
+author: "Shashank Shekhar"
+date: "2022-11-13"
+categories: [news]
+---
+
+This is my first blog. Welcome!
+
+![](thumbnail.jpg)
+
+This is start of my bloging journey. I will writing about Deep Learning and this assciated with it. The topics I would like to write about in near future are - Computer Vision, NLP, Machine Learning on Azure Cloud, Deployment of ML Application on Azure Cloud, MLOps.
+
+
+With this I am also takaing a 12-Week Blog Challenge, where ober the course of next 12 Weeks I will be writing - (atleast)1 Blog a week.
