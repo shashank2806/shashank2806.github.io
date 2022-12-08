@@ -95,6 +95,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <script src="../../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../../">
+<link href="../../favicon.ico" rel="icon">
 <script src="../../site_libs/quarto-html/quarto.js"></script>
 <script src="../../site_libs/quarto-html/popper.min.js"></script>
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -126,6 +127,13 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 
 <link rel="stylesheet" href="../../styles.css">
+<meta property="og:title" content="Shashank Shekhar - Deploy ML Application on Azure App Service">
+<meta property="og:description" content="In this blog, I am going to show how to deploy a Machine Learning API on Azure App Service (Web App).">
+<meta property="og:site-name" content="Shashank Shekhar">
+<meta name="twitter:title" content="Shashank Shekhar - Deploy ML Application on Azure App Service">
+<meta name="twitter:description" content="In this blog, I am going to show how to deploy a Machine Learning API on Azure App Service (Web App).">
+<meta name="twitter:creator" content="@ShashankData">
+<meta name="twitter:card" content="summary_large_image">
 </head>
 
 <body class="nav-fixed">
@@ -148,7 +156,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     <a class="nav-link" href="../../index.html">Home</a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="https://shashankshekhar.me/myblog/">Blog</a>
+    <a class="nav-link" href="../../blog.html">Blog</a>
   </li>  
   <li class="nav-item">
     <a class="nav-link" href="../../about.html">About</a>
@@ -166,7 +174,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
  </a>
   </li>  
   <li class="nav-item compact">
-    <a class="nav-link" href="https://twitter.com/shekhar28june"><i class="bi bi-twitter" role="img">
+    <a class="nav-link" href="https://twitter.com/ShashankData"><i class="bi bi-twitter" role="img">
 </i> 
  </a>
   </li>  
@@ -177,44 +185,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     </nav>
 </header>
 <!-- content -->
-<header id="title-block-header" class="quarto-title-block default page-columns page-full">
-  <div class="quarto-title-banner page-columns page-full">
-    <div class="quarto-title column-body">
-      <h1 class="title">Deploy ML Application on Azure App Service</h1>
-                  <div>
-        <div class="description">
-          In this blog, I am going to show how to deploy a Machine Learning API on Azure App Service (Web App).
-        </div>
-      </div>
-                          <div class="quarto-categories">
-                <div class="quarto-category">Azure</div>
-                <div class="quarto-category">Flask</div>
-                <div class="quarto-category">API</div>
-              </div>
-                  </div>
-  </div>
-    
-  
-  <div class="quarto-title-meta">
-
-      <div>
-      <div class="quarto-title-meta-heading">Author</div>
-      <div class="quarto-title-meta-contents">
-               <p>Shashank Shekhar </p>
-            </div>
-    </div>
-      
-      <div>
-      <div class="quarto-title-meta-heading">Published</div>
-      <div class="quarto-title-meta-contents">
-        <p class="date">November 20, 2022</p>
-      </div>
-    </div>
-      
-    </div>
-    
-  
-  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
@@ -231,10 +202,45 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </nav>
     </div>
 <!-- main -->
-<main class="content quarto-banner-title-block" id="quarto-document-content">
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Deploy ML Application on Azure App Service</h1>
+  <div class="quarto-categories">
+    <div class="quarto-category">Azure</div>
+    <div class="quarto-category">Flask</div>
+    <div class="quarto-category">API</div>
+  </div>
+  </div>
+
+<div>
+  <div class="description">
+    In this blog, I am going to show how to deploy a Machine Learning API on Azure App Service (Web App).
+  </div>
+</div>
 
 
+<div class="quarto-title-meta">
 
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Shashank Shekhar </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">November 20, 2022</p>
+    </div>
+  </div>
+    
+  </div>
+  
+
+</header>
 
 <p>In this blog, I am going to show how to deploy a Machine Learning API on Azure App Service. I am assuming that you have trained your model, wrapped it into the API, and the API is running on the local machine. For this blog, I have trained a deep-learning model with help of PyTorch. The API I am going to deploy is a simple Cat vs Dog Classification API, which takes input images and returns if it is a cat or dog. <img src="0.png" class="img-fluid" data-fig-align="center"> <strong>By the end of this blog you will be able to understand:</strong></p>
 <ol type="1">
@@ -446,6 +452,8 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     });
   }
 });
+</script>
+<script src="https://utteranc.es/client.js" repo="shashank2806/myblog" issue-term="pathname" theme="github-light" crossorigin="anonymous" async="">
 </script>
 </div> <!-- /content -->
 
