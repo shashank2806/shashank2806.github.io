@@ -5,6 +5,11 @@ project:
 website:
   title: "Shashank Shekhar"
   site-url: https://shashankshekhar.me/
+  favicon: favicon.ico
+  # enhanced appearance when someone links the site
+  twitter-card:
+    creator: "@ShashankData"
+    card-style: summary_large_image
   navbar:
     pinned: True
     left:
@@ -20,7 +25,7 @@ website:
       - icon: github
         href: https://github.com/shashank2806
       - icon: twitter
-        href: https://twitter.com/shekhar28june
+        href: https://twitter.com/ShashankData
 
 format:
   html:
