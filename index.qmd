@@ -1,5 +1,5 @@
 ---
-title: Hello World! I am Shashank Shekhar
+title: Shashank Shekhar | Home
 comments: False
 format:
   html:
@@ -39,11 +39,9 @@ about:
       href: mailto:correspond.shashank@gmail.com
 ---
 
-:::::{#about-me}
-I am working as Data Scientist with 3+ years of experience. I have led several Deep learning based Vision & NLP Projects. I am well versed on developing and deploying ML solutions on Azure cloud.
-
-Read more about me [here](about.qmd).
-:::::
+:::{#about-me}
+I am a Data Scientist with 3+ years of experience, specilized in Deep Learning & Computer Vision. I work on cutting-edge Vision, NLP and Speech. I have led several Deep learning based Vision & NLP Projects. I am well versed in design, develop and deploy ML solutions on Azure Cloud Environment. I have experience working in various verticals like - Finance, Pharma, Insurance, and Retail.
+:::
 
 :::::{.grid}
 ::::{.g-col-12 .g-col-md-12}
