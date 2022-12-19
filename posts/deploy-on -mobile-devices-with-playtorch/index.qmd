@@ -6,11 +6,17 @@ date: "2022-12-18"
 categories: [PyTorch, React Native, PlayTorch, 'Machine Learning']
 ---
 
+
+
 In this blog, I am going to show how to deploy a PyTorch Custom model on the Mobile Devices(iOS/android) with help of ecosystem of [PlayTorch](https://playtorch.dev/) and [Sanck Expo](https://snack.expo.dev/). This can be a very quick way of prototyping a mobile application for the demo purposes. It can be used later for going in production as well. 
 
 I am going to build a car view calssification model for this blog which will infer if the picture taken of the car is - Front View, Front Left view or Front Right view. The outcome will be something like this image.
 
 ![Results on Mobile Application](0.jpg){fig-align="center"}
+
+
+Project GitHub Link: <https://github.com/shashank2806/playtorch-demo>
+
 
 **This Blog is is divided in 5 parts:**
 
@@ -75,7 +81,7 @@ I hope you guys now have fimiliarity with PlayTorch and Snack Expo and you have 
 ### Step 4: Integrating the model in React Native.
 We have the Model ready. We now also understand the PlayTorch Ecosystem. Let's integarte our trainied model to React Code on Sanck Expo.
 
-Link to my final code: <https://snack.expo.dev/@shashank2806/car-view>
+Link to my final code: <https://github.com/shashank2806/playtorch-demo/tree/master/car-view-react-app>
 
 Folder strucure React Native Code:
 
