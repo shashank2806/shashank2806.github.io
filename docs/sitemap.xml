@@ -6,11 +6,11 @@
   </url>
   <url>
     <loc>https://shashankshekhar.me/index.html</loc>
-    <lastmod>2022-12-08T02:56:24.324Z</lastmod>
+    <lastmod>2022-12-19T04:31:45.170Z</lastmod>
   </url>
   <url>
     <loc>https://shashankshekhar.me/blog.html</loc>
-    <lastmod>2022-12-08T02:57:19.534Z</lastmod>
+    <lastmod>2022-12-19T04:31:46.160Z</lastmod>
   </url>
   <url>
     <loc>https://shashankshekhar.me/posts/welcome/index.html</loc>
@@ -23,5 +23,9 @@
   <url>
     <loc>https://shashankshekhar.me/posts/deploy-on-web-app/index.html</loc>
     <lastmod>2022-12-08T03:46:20.633Z</lastmod>
+  </url>
+  <url>
+    <loc>https://shashankshekhar.me/posts/deploy-on -mobile-devices-with-playtorch/index.html</loc>
+    <lastmod>2022-12-19T04:31:47.150Z</lastmod>
   </url>
 </urlset>

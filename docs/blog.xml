@@ -10,7 +10,111 @@
 <atom:link href="https://shashankshekhar.me/blog.xml" rel="self" type="application/rss+xml"/>
 <description></description>
 <generator>quarto-1.1.251</generator>
-<lastBuildDate>Sat, 26 Nov 2022 18:30:00 GMT</lastBuildDate>
+<lastBuildDate>Sat, 17 Dec 2022 18:30:00 GMT</lastBuildDate>
+<item>
+  <title>Deploy Custom PyTorch Model on Mobile App with PlayTorch</title>
+  <dc:creator>Shashank Shekhar</dc:creator>
+  <link>https://shashankshekhar.me/posts/deploy-on -mobile-devices-with-playtorch/index.html</link>
+  <description><![CDATA[ 
+
+
+
+<p>In this blog, I am going to show how to deploy a PyTorch Custom model on the Mobile Devices(iOS/android) with help of ecosystem of <a href="https://playtorch.dev/">PlayTorch</a> and <a href="https://snack.expo.dev/">Sanck Expo</a>. This can be a very quick way of prototyping a mobile application for the demo purposes. It can be used later for going in production as well.</p>
+<p>I am going to build a car view calssification model for this blog which will infer if the picture taken of the car is - Front View, Front Left view or Front Right view. The outcome will be something like this image.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="https://shashankshekhar.me/posts/deploy-on -mobile-devices-with-playtorch/0.jpg" class="img-fluid figure-img"></p>
+<p></p><figcaption class="figure-caption">Results on Mobile Application</figcaption><p></p>
+</figure>
+</div>
+<p><strong>This Blog is is divided in 5 parts:</strong></p>
+<ol type="1">
+<li>Creating custom PyTorch Model</li>
+<li>Optimizing the model for Mobile Devices.</li>
+<li>Getting started with <a href="https://playtorch.dev/">PlayTorch</a> and <a href="https://snack.expo.dev/">Sanck Expo</a>.</li>
+<li>Integrating the model in React Native.</li>
+<li>Testing the Model in Mobile Device.</li>
+</ol>
+<p><strong>Prerequisites:</strong> 1. Basic knowledge of model training in PyTorch.</p>
+<section id="step-1-creating-custom-pytorch-model." class="level3">
+<h3 class="anchored" data-anchor-id="step-1-creating-custom-pytorch-model.">Step 1 : Creating custom PyTorch Model.</h3>
+<p><em>If you already have a trainied classification model, you can skip this step.</em> I am going to train a model for car view classification. For this I will scapre the data from the internet, around 80 images of each class. I will train a MobileNet model. Refer to GitHub Repository for <a href="https://github.com/shashank2806/playtorch-demo">Training Notebook</a> and <a href="https://github.com/shashank2806/playtorch-demo">Training Images</a>.</p>
+<ol type="1">
+<li><p>Dataset</p>
+<p>As mentioned earlier. I have used internet to scrape the data. I used <a href="https://github.com/datnnt1997/CygnusX1">CygnusX1</a> for downloading the dataset from the google. In the dataset I kept <code>217</code> images in training and <code>21</code> images in validation. Clasess are <code>car_front_view</code>, <code>car_front_left_view</code>, <code>car_front_right_view</code>.</p></li>
+<li><p>Model Training</p>
+<p>As I am creating this model from scratch. I am going to train it on <code>MobileNet_v3</code> Architecture. If you have a model trained on <code>ResNet</code> or other architecture, that is fine too. After training for 25 epochs, it achieved accuracy of ~90%. test the model on few images and save it.</p>
+<div class="sourceCode" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1">torch.save(model_ft, <span class="st" style="color: #20794D;">'view_model_mobile.pt'</span>)</span></code></pre></div></li>
+</ol>
+</section>
+<section id="step-2-optimizing-the-model-for-mobile-devices." class="level3">
+<h3 class="anchored" data-anchor-id="step-2-optimizing-the-model-for-mobile-devices.">Step 2 : Optimizing the model for Mobile Devices.</h3>
+<p>After the model is trainied, one essential step before model can be used in iOS/Android apps is to convert the Python-dependent model to TrochScript, which can then further be optimized for mobile apps. Conversion to TorchScript can be as simple as a single call, or as complicated as changing the original model in many different places.</p>
+<p>In our case we can just convert it with a single call. <em>For complex model refer this <a href="https://pytorch.org/tutorials/recipes/script_optimized.html">Pytorch doc</a></em></p>
+<p>Load the model saved in last step. Convert the model model to TorchScipt and then optimize it for mobile device with just few lines of code.</p>
+<div class="sourceCode" id="cb2" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><span class="im" style="color: #00769E;">import</span> torch</span>
+<span id="cb2-2"><span class="im" style="color: #00769E;">import</span> torchvision</span>
+<span id="cb2-3"><span class="im" style="color: #00769E;">from</span> torch.utils.mobile_optimizer <span class="im" style="color: #00769E;">import</span> optimize_for_mobile</span>
+<span id="cb2-4"></span>
+<span id="cb2-5">model <span class="op" style="color: #5E5E5E;">=</span> torch.load(<span class="st" style="color: #20794D;">'view_model_mobile.pt'</span>)</span>
+<span id="cb2-6">model.<span class="bu" style="color: null;">eval</span>()</span>
+<span id="cb2-7">example <span class="op" style="color: #5E5E5E;">=</span> torch.rand(<span class="dv" style="color: #AD0000;">1</span>, <span class="dv" style="color: #AD0000;">3</span>, <span class="dv" style="color: #AD0000;">224</span>, <span class="dv" style="color: #AD0000;">224</span>)</span>
+<span id="cb2-8">scripted_model <span class="op" style="color: #5E5E5E;">=</span> torch.jit.script(model, example)</span>
+<span id="cb2-9">optimized_model <span class="op" style="color: #5E5E5E;">=</span> optimize_for_mobile(scripted_model)</span>
+<span id="cb2-10">optimized_model._save_for_lite_interpreter(<span class="st" style="color: #20794D;">"view_model_mobile.ptl"</span>)</span></code></pre></div>
+<p>Now the model is optimized for mobile devices. It is saved as <code>view_model_mobile.ptl</code>. This is the model we will be using for inference on Mobile device.</p>
+<p>Now we are ready for the next step - Creating the App.</p>
+</section>
+<section id="step-3-getting-started-with-playtorch-and-sanck-expo" class="level3">
+<h3 class="anchored" data-anchor-id="step-3-getting-started-with-playtorch-and-sanck-expo">Step 3: Getting started with PlayTorch and Sanck Expo</h3>
+<p><a href="https://github.com/facebookresearch/playtorch">PlayTorch</a> is Framework for rapidly creating mobile AI Apps. It has a React Native Package to run on-device inference. There are multiple App templates and <em>we just need to replace the model weights and metadata to tailor app to our needs</em></p>
+<p>To get started with PlayTorch. Download the PlayTorch App and go through this <a href="https://playtorch.dev/docs/tutorials/get-started/">simple get-started guide</a>. Create your Hello World App. It will not take maore than 10 minutes!</p>
+<p>PlayTorch uses <a href="https://snack.expo.dev/">Sanck Expo</a> for code development. Snack Expo is a Cloud IDE for developing React Native Apps. It saves us from hassle of setting up the development environment on our on machine. It also saves us form the hassle of paring of the Andriod device for development. You can just san a QR Code on the IDE and run the code in the PlayTorch App. <em>The development experience is very hassle-free. You save a lot of time. This is what is like about PlayTorch - comparing to other methods(Java)</em></p>
+<p>I hope you guys now have fimiliarity with PlayTorch and Snack Expo and you have created you Hello World! App. Let’s move forward.</p>
+</section>
+<section id="step-4-integrating-the-model-in-react-native." class="level3">
+<h3 class="anchored" data-anchor-id="step-4-integrating-the-model-in-react-native.">Step 4: Integrating the model in React Native.</h3>
+<p>We have the Model ready. We now also understand the PlayTorch Ecosystem. Let’s integarte our trainied model to React Code on Sanck Expo.</p>
+<p>Link to my final code: <a href="https://snack.expo.dev/@shashank2806/car-view" class="uri">https://snack.expo.dev/@shashank2806/car-view</a></p>
+<p>Folder strucure React Native Code:</p>
+<pre><code>1. `App.js`: Main file for importing other modules and files, Script for app layout, camera and style is present here.
+2. `imageClassifier.js`: Model loading and images transforms/preprocessing are presnet here.
+3. `ImageNetClasses.json`: Your output lables are listed here. 
+4. `package.json`: Contains required packages.</code></pre>
+<p>You need to change <code>MODEL_URL</code> in <code>imageClassifier.js</code>. Put the url to your tarined model.</p>
+<div class="sourceCode" id="cb4" style="background: #f1f3f5;"><pre class="sourceCode javascript code-with-copy"><code class="sourceCode javascript"><span id="cb4-1"><span class="co" style="color: #5E5E5E;">// 3. URL to the image classification model.</span></span>
+<span id="cb4-2"><span class="kw" style="color: #003B4F;">const</span> MODEL_URL <span class="op" style="color: #5E5E5E;">=</span> <span class="st" style="color: #20794D;">'https://github.com/shashank2806/playtorch-demo/raw/master/view_model_mobile.ptl'</span><span class="op" style="color: #5E5E5E;">;</span></span></code></pre></div>
+<p>You also need to change the <code>ImageNetClasses.json</code>. Put your lables here, In my case it were.</p>
+<div class="sourceCode" id="cb5" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1">[</span>
+<span id="cb5-2">    <span class="st" style="color: #20794D;">"car_front_left_view"</span>,</span>
+<span id="cb5-3">    <span class="st" style="color: #20794D;">"car_front_right_view"</span>,</span>
+<span id="cb5-4">    <span class="st" style="color: #20794D;">"car_front_view"</span></span>
+<span id="cb5-5">]</span></code></pre></div>
+<p>If you have done all this steps correctly, you should now see a working demo on your mobile device.</p>
+</section>
+<section id="step-5-testing-the-model-in-mobile-device." class="level3">
+<h3 class="anchored" data-anchor-id="step-5-testing-the-model-in-mobile-device.">Step 5: Testing the Model in Mobile Device.</h3>
+<p>Now you can test demo with on your mobile device. Share it with others as well. You can view my demo with this URL <a href="https://playtorch.dev/snack/@shashank2806/car-view" class="uri">https://playtorch.dev/snack/@shashank2806/car-view</a>.</p>
+<p>I tested it on my Mobile. Even though the dataset it was trained on was Artifical. It is working very accurate on real-world images as well.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="https://shashankshekhar.me/posts/deploy-on -mobile-devices-with-playtorch/0.jpg" class="img-fluid figure-img"></p>
+<p></p><figcaption class="figure-caption">Results on Mobile Application</figcaption><p></p>
+</figure>
+</div>
+
+
+</section>
+
+ ]]></description>
+  <category>PyTorch</category>
+  <category>React Native</category>
+  <category>PlayTorch</category>
+  <category>Machine Learning</category>
+  <guid>https://shashankshekhar.me/posts/deploy-on -mobile-devices-with-playtorch/index.html</guid>
+  <pubDate>Sat, 17 Dec 2022 18:30:00 GMT</pubDate>
+  <media:content url="https://shashankshekhar.me/posts/deploy-on -mobile-devices-with-playtorch/0.jpg" medium="image" type="image/jpeg"/>
+</item>
 <item>
   <title>Linear Regression - A Deep Dive!</title>
   <dc:creator>Shashank Shekhar</dc:creator>
@@ -364,7 +468,6 @@ Cost Decresing 9.310642443891272</code></pre>
   <dc:creator>Shashank Shekhar</dc:creator>
   <link>https://shashankshekhar.me/posts/deploy-on-web-app/index.html</link>
   <description><![CDATA[ 
-
 
 
 
